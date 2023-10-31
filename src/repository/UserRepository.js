@@ -43,6 +43,10 @@ class UserRepository {
 
         await selectedUser.save()
     }
+
+    getByEmail = async (email) => {
+        return this.userModel.findOne({ email })
+    }
 }
 
 

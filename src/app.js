@@ -7,6 +7,11 @@ const jwt = require('jsonwebtoken');
 
 let app = express();
 
+
+// Middleware
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+
 app.use(cors({
     origin: '*'
 }));
@@ -47,17 +52,35 @@ const serviceController = new ServiceController(serviceService)
 
 const ServiceScheduleRepository = require('./repository/ServiceScheduleRepository');
 const ServiceScheduleService = require('./services/ServiceScheduleService')
-const ServiceScheduleController = require('./controllers/ServiceScheduleController')
+const ServiceScheduleController = require('./controllers/ServiceScheduleController');
+const AuthController = require('./controllers/AuthController');
 
 const serviceScheduleRepository = new ServiceScheduleRepository(models.ServiceScheduleModel);
 const serviceScheduleService = new ServiceScheduleService(serviceScheduleRepository)
 const serviceScheduleController = new ServiceScheduleController(serviceScheduleService)
 
+const authController = new AuthController(userService, jwt)
 
 app.get('/', function (req, res) {
     res.send('Hello World!');
 });
 
+const verifyToken = (req, res, next) => {
+    const bearerHeader = req.headers['authorization'];
+
+    if (typeof bearerHeader !== 'undefined') {
+        const token = bearerHeader.split(' ')[1];
+        jwt.verify(token, process.env.SECRET, (err, decoded) => {
+            if (err) {
+                return res.status(403).json({ message: 'Token is not valid' });
+            }
+            req.user = decoded;
+            next();
+        });
+    } else {
+        res.status(401).json({ message: 'Unauthorized' });
+    }
+}
 
 /* ----------- Newsletters ----------- */
 app.post('/company', (req, res, next) => {
@@ -88,6 +111,10 @@ app.post('/user', (req, res, next) => {
     userController.create(req, res, next)
 })
 
+app.get('/user/email', verifyToken, (req, res, next) => {
+    userController.getByEmail(req, res, next)
+})
+
 app.patch('/user', (req, res, next) => {
     userController.update(req, res, next)
 })
@@ -116,6 +143,10 @@ app.patch('/service-schedule/finish', (req, res, next) => {
     serviceScheduleController.finish(req, res, next)
 })
 
+// Authentication
+app.post('/login', (req, res, next) => {
+    authController.login(req, res, next)
+})
 app.listen(3000, function () {
     console.log('App listening on port 3000!');
 });

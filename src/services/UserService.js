@@ -34,6 +34,14 @@ class UserService {
             return error.message
         }
     }
+
+    getByEmail = async(email) => {
+        try{
+            return this.userRepository.getByEmail(email)
+        } catch(error) {
+            return error.message
+        }
+    }
 }
 
 module.exports = UserService;
