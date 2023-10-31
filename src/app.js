@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const cors = require('cors');
 const express = require('express');
 let bodyParser = require('body-parser');
+const jwt = require('jsonwebtoken');
 
 let app = express();
 
@@ -88,6 +89,10 @@ app.post('/user', (req, res, next) => {
 })
 
 app.patch('/user', (req, res, next) => {
+    userController.update(req, res, next)
+})
+
+app.patch('/user/update-password', (req, res, next) => {
     userController.update(req, res, next)
 })
 

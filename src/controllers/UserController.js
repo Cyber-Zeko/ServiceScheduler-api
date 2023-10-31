@@ -21,6 +21,15 @@ class UserController {
         }
     }
 
+    updatePassword = async (req, res, next) => {
+        try {
+            await this.userService.updatePassword(req.body);
+            return res.status(200).json({ message: 'User updated' });
+        } catch (error) {
+            return res.status(400).json({ message: error.message });
+        }
+    }
+
     delete = async (req, res, next) => {
         try {
             await this.userService.update(req.body);

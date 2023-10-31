@@ -5,7 +5,6 @@ class UserService {
 
     create = async (user) => {
         try {
-            user.isActive = true
             return this.userRepository.create(user)
         } catch (error) {
             return error.message
@@ -15,6 +14,14 @@ class UserService {
     update = async (user) => {
         try {
             return this.userRepository.update(user)
+        } catch (error) {
+            return error.message
+        }
+    }
+
+    updatePassword = async (user) => {
+        try {
+            return this.userRepository.updatePassword(user)
         } catch (error) {
             return error.message
         }
