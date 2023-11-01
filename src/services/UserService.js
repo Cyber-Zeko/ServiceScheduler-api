@@ -1,3 +1,4 @@
+const bcrypt = require('bcrypt');
 class UserService {
     constructor(userRepository) {
         this.userRepository = userRepository
@@ -5,12 +6,15 @@ class UserService {
 
     create = async (user) => {
         try {
+            const salt = bcrypt.genSaltSync(10);
+            user.password = bcrypt.hashSync(user.password, salt);
+
             return this.userRepository.create(user)
         } catch (error) {
             return error.message
         }
     }
-    
+
     update = async (user) => {
         try {
             return this.userRepository.update(user)
@@ -26,7 +30,7 @@ class UserService {
             return error.message
         }
     }
-    
+
     update = async (user) => {
         try {
             return this.userRepository.delete(user)
@@ -35,10 +39,10 @@ class UserService {
         }
     }
 
-    getByEmail = async(email) => {
-        try{
+    getByEmail = async (email) => {
+        try {
             return this.userRepository.getByEmail(email)
-        } catch(error) {
+        } catch (error) {
             return error.message
         }
     }

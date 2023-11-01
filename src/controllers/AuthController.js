@@ -1,3 +1,5 @@
+const bcrypt = require('bcrypt');
+
 class AuthController {
     constructor(userService, jwt) {
         this.userService = userService
@@ -11,11 +13,13 @@ class AuthController {
         if (!user) {
             return res.status(401).json({ message: 'Authentication failed' });
         }
+        
+        let passwordMatch = await bcrypt.compareSync(password, user.password);
 
-        if(user.password !== password){
+        if (!passwordMatch) {
             return res.status(401).json({ message: 'Password incorrect!' });
         }
-        
+
         const token = this.jwt.sign({
             userId: user.id,
             email: user.email
@@ -24,7 +28,7 @@ class AuthController {
             { expiresIn: '12h' }
         );
 
-        return res.status(200).json({token})
+        return res.status(200).json({ token })
     }
 }
 

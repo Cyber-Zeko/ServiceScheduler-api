@@ -5,6 +5,10 @@ class UserController {
 
     create = async (req, res, next) => {
         try {
+            const existingUser = await this.userService.getByEmail(req.body.email)
+            if (existingUser) {
+                return res.status(400).json({ message: "User already exists" });
+            }
             await this.userService.create(req.body);
             return res.status(200).json({ message: 'User added' });
         } catch (error) {
